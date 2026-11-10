@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>La Cometa del Dolce Inizio</title>
+<style>
+:root{--bg:#e6e9f7;--surf:#ffffff;--ink:#23264f;--mute:#555a86;--acc:#5b52c9;--line:#c6cbea;--onacc:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14163a;--surf:#202458;--ink:#eef0ff;--mute:#b4b9e6;--acc:#9a93f2;--line:#363b82;--onacc:#14163a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14163a;--surf:#202458;--ink:#eef0ff;--mute:#b4b9e6;--acc:#9a93f2;--line:#363b82;--onacc:#14163a;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;font-size:1.1rem;line-height:1.45}
+main{max-width:480px;margin:0 auto;padding:16px 14px 40px;text-align:center}
+h1{font-size:1.9rem;line-height:1.15;margin:.2em 0}
+p{margin:.4em 0}
+#sky{position:relative;width:100%;aspect-ratio:4/5;border-radius:24px;overflow:hidden;margin:12px 0;
+background:radial-gradient(circle at 18% 12%,#fff8 0 2px,transparent 3px),radial-gradient(circle at 70% 18%,#fff8 0 2px,transparent 3px),radial-gradient(circle at 40% 8%,#fff8 0 1.5px,transparent 2.5px),radial-gradient(circle at 90% 40%,#fff8 0 2px,transparent 3px),linear-gradient(180deg,#2c2f7a 0%,#6a5acd 55%,#f2a1b5 100%)}
+svg{position:absolute;inset:0;width:100%;height:100%}
+.seg{fill:none;stroke:#ffffff55;stroke-width:10;stroke-linecap:round;stroke-dasharray:1 16;vector-effect:non-scaling-stroke;transition:stroke .6s}
+.seg.lit{stroke:#ffe27a;stroke-dasharray:none;stroke-width:12;filter:drop-shadow(0 0 6px #ffe27a)}
+.st{position:absolute;width:min(16%,70px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:4px dashed #fff;background:#ffffff22;color:#fff;font:inherit;font-weight:700;font-size:1.3rem;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;transition:background .5s,border-color .5s}
+.st.lit{border-style:solid;font-size:2rem;color:#23264f;box-shadow:0 0 18px 4px #ffe27aaa}
+.st.hint{animation:pulse 1s ease-in-out 3}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.25)}}
+.lab{position:absolute;transform:translateX(-50%);font-size:.8rem;font-weight:700;color:#fff;text-shadow:0 1px 3px #0008;white-space:nowrap;pointer-events:none}
+.tray{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;min-height:100px;margin:10px 0}
+.pup{touch-action:none;border:0;background:none;padding:0;width:120px;cursor:grab;font:inherit;color:var(--ink);position:relative}
+.pup .in{display:flex;flex-direction:column;align-items:center;gap:2px;animation:float 3.4s ease-in-out infinite}
+.pup:nth-child(2n) .in{animation-delay:-1.2s}.pup:nth-child(3n) .in{animation-delay:-2.2s}
+.pup .c{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.6rem;border:4px solid var(--surf);box-shadow:0 3px 10px #0003}
+.pup small{font-size:.8rem;line-height:1.15;display:block}
+.pup.sel .c{outline:4px solid var(--acc);outline-offset:3px}
+@keyframes float{50%{transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){.pup .in,.st.hint{animation:none}.seg,.st{transition:none}}
+button:focus-visible,summary:focus-visible{outline:4px solid var(--acc);outline-offset:3px}
+.btn{background:var(--acc);color:var(--onacc);border:0;border-radius:999px;padding:12px 24px;font:inherit;font-weight:700;cursor:pointer;margin:6px}
+#msg{min-height:2.8em;font-weight:700}
+details{background:var(--surf);border:2px solid var(--line);border-radius:16px;padding:10px 14px;margin-top:22px;text-align:left;font-size:.95rem}
+summary{cursor:pointer;font-weight:700;color:var(--mute)}
+details h3{margin:.8em 0 .2em;font-size:1rem}
+details li{margin:.3em 0}
+.win{display:none;font-size:2.4rem;background:var(--surf);border:3px solid #ffd36b;border-radius:24px;padding:14px;margin:10px 0}
+.win p{font-size:1.15rem;font-weight:700;margin:.3em 0}
+.bub{background:var(--surf);border:2px solid var(--line);border-radius:18px;padding:10px 14px;min-height:6.2em;margin:8px 0;display:flex;flex-direction:column;gap:6px;align-items:center;justify-content:center;font-size:1.05rem}
+.spk{background:var(--acc);color:var(--onacc);border:0;border-radius:999px;padding:6px 14px;font:inherit;font-size:.9rem;cursor:pointer}
+.calm{color:var(--mute);font-size:.95rem;margin:0}
+#sky{background:radial-gradient(ellipse at 50% 112%,#fff3c8dd 0,#ffc9a0aa 24%,transparent 62%),linear-gradient(180deg,#3b3f8f 0%,#7a5fc0 22%,#c776b5 46%,#f59bb5 68%,#ffb59a 86%,#ffd9a8 100%)}
+.moon{position:absolute;left:12%;top:7%;width:44px;height:44px;border-radius:50%;box-shadow:-14px 6px 0 0 #fff3c4;filter:drop-shadow(0 0 8px #fff6c8);pointer-events:none}
+.stars i{position:absolute;color:#fff;font-style:normal;text-shadow:0 0 6px #fff;pointer-events:none;animation:tw 3.2s ease-in-out infinite}
+@keyframes tw{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){.stars i{animation:none}}
+.lab{background:#2c2f7acc;padding:2px 10px;border-radius:999px}
+.st:not(.lit){background:#2c2f7a66;text-shadow:0 1px 3px #2c2f7a}
+.seg{stroke:#ffffffaa}
+.seg.lit{stroke:#ffe27a}
+main{padding:8px 12px 24px}
+.play{position:relative;display:flex;flex-direction:column;height:calc(100vh - 16px);height:calc(100dvh - 16px);min-height:480px}
+.play h1{font-size:1.25rem;margin:2px 0}
+.intro{display:none}
+.calm{font-size:.8rem}
+#sky{flex:1 1 auto;min-height:190px;aspect-ratio:auto;margin:4px 0}
+#msg{min-height:0;margin:2px 0;font-size:.95rem}
+.bub{min-height:4.4em;padding:6px 10px;margin:4px 0;font-size:.95rem;flex-direction:row;justify-content:space-between;gap:8px;text-align:left}
+.tray{flex-wrap:nowrap;gap:8px;min-height:0;margin:4px 0;justify-content:center}
+.pup{width:15%;max-width:68px}
+.pup .in{width:100%}
+.pup .c{width:100%;height:auto;aspect-ratio:1;font-size:clamp(1.4rem,7vw,2.2rem);border-width:3px}
+.pup small{display:none}
+#reset{padding:6px 16px;margin:2px auto;font-size:.9rem;min-height:0}
+.win.on{display:block;position:absolute;left:0;right:0;bottom:44px;z-index:5;font-size:1.6rem;padding:8px 12px}
+.win p{font-size:1rem;margin:.1em 0}
+@media (min-aspect-ratio:5/4){
+main{max-width:1100px}
+.play{display:grid;grid-template-columns:minmax(0,1fr) 300px;grid-template-rows:auto auto auto auto auto 1fr auto;column-gap:14px;min-height:0}
+.play h1{grid-column:1/3}
+#sky{grid-column:1;grid-row:2/8;margin:0;min-height:0}
+.calm{grid-column:2;grid-row:2}
+#msg{grid-column:2;grid-row:3}
+.bub{grid-column:2;grid-row:4;min-height:5.5em}
+.tray{grid-column:2;grid-row:5;flex-wrap:wrap;align-content:flex-start}
+.pup{width:30%;max-width:min(92px,14vh)}
+.pup small{display:block}
+#reset{grid-column:2;grid-row:7;align-self:end}
+.win.on{left:auto;width:300px;right:0;bottom:50px}
+}
+@media (min-aspect-ratio:5/4) and (max-height:560px){.pup small{display:none}}
+.bd{position:absolute;right:-6px;bottom:-6px;width:1.9em;height:1.9em;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0004;font-size:clamp(.85rem,3.6vw,1.2rem);line-height:1}
+.pup .c{position:relative}
+.st .bd{font-size:.5em;right:-8px;bottom:-8px}
+.hd{background:#14163a;color:#fff;padding:14px 16px 12px;border-bottom:5px solid #f4c542;display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center}
+.logo{width:48px;height:48px;border-radius:14px;background:linear-gradient(135deg,#f4c542,#f08fa8);display:flex;align-items:center;justify-content:center;font-size:1.7rem}
+.ttl{font-family:Georgia,serif;font-weight:700;color:#f4c542;font-size:1.3rem;letter-spacing:.03em;line-height:1.2}
+.hsub{font-size:.85rem;color:#d7dbff}
+.hb{display:flex;gap:8px;width:100%}
+.hb button{background:#202458;border:2px solid #363b82;color:#fff;border-radius:12px;padding:6px 16px;font:inherit;cursor:pointer}
+.hb button[aria-pressed=true]{background:#2f7d5b}
+.tabs{display:flex;gap:6px;overflow-x:auto;background:var(--surf);padding:10px;box-shadow:0 2px 8px #0002;position:sticky;top:0;z-index:20}
+.tabs button{flex:0 0 auto;white-space:nowrap;border:2px solid transparent;background:none;color:var(--mute);border-radius:12px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer}
+.tabs button[aria-selected=true]{background:var(--bg);border-color:var(--acc);color:var(--ink)}
+.tabs button.gm{border-color:#f4c542}
+.tp{text-align:left}#t5{text-align:center}
+.card{background:var(--surf);border:2px solid var(--line);border-radius:20px;padding:16px;margin:8px 0}
+.card h2{font-size:1.2rem;font-family:Georgia,serif;margin:.9em 0 .3em}.card h2:first-child{margin-top:0}
+.card li{margin:.3em 0}
+.opb{border:3px solid var(--acc);background:var(--surf);color:var(--ink);border-radius:14px;padding:10px 14px;font:inherit;cursor:pointer;text-align:left}
+.opb[aria-pressed=true]{background:var(--acc);color:var(--onacc)}
+.lvs{display:grid;gap:10px;margin:10px 0}
+.opt label{display:flex;gap:10px;align-items:center;margin:12px 0}
+.opt input{width:24px;height:24px}
+.chp{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0}
+.noicons .bd{display:none}.nostars .stars{display:none}
+.play h1{display:none}
+.play{height:calc(100vh - 230px);height:calc(100dvh - 230px);min-height:400px}
+.win.on{display:block}
+</style>
+</head>
+<body>
+<header class="hd"><div class="logo" aria-hidden="true">☄️</div><div><div class="ttl">LA COMETA DEL DOLCE INIZIO</div><div class="hsub">Laboratorio didattico di routine mattutina, sequenzialità e autoregolazione</div></div><div class="hb"><button id="hsp" aria-pressed="false" aria-label="Lettura ad alta voce">🔊</button><button id="hfs" aria-label="Dimensione del testo">A</button></div></header>
+<nav class="tabs" id="tabs" role="tablist"></nav>
+<main>
+<section class="tp" id="t1"><div class="card">
+<h2>Descrizione</h2>
+<p>La Cometa del Dolce Inizio trasforma la routine del mattino in un viaggio fantastico: sei cuccioli devono salire, nell’ordine giusto, sulle sei stelle di una cometa che attraversa il cielo dell’alba. L’ordine del tempo non è una griglia scolastica ma una scia curva e morbida, da percorrere con calma.</p>
+<h2>Destinatari e tempi</h2>
+<p><b>Età consigliata: 5–9 anni</b> (ultimo anno dell’infanzia e primaria), con tre livelli progressivi: 5–6, 6–7 e 7–9 anni.</p>
+<ul><li>Bambini della scuola primaria che hanno bisogno di sostegno nell’attenzione, nell’autoregolazione e nella gestione delle transizioni quotidiane.</li><li>Durata: 10–15 minuti, senza limite di tempo e senza punteggi.</li><li>Strumenti: tablet, telefono o computer; la prima volta con un adulto vicino.</li></ul>
+<h2>Prerequisiti</h2>
+<ul><li>Riconoscere i numeri da 1 a 6.</li><li>Leggere brevi frasi, oppure ascoltarle con il tasto 🔊 Ascolta.</li><li>Toccare o trascinare con il dito o con il mouse.</li><li>Conoscere, anche in modo approssimativo, le azioni della propria mattina.</li><li>Un adulto di riferimento che condivide con il bambino l’ordine reale delle azioni a casa.</li></ul>
+</div></section>
+<section class="tp" id="t2" hidden><div class="card">
+<h2>Competenze chiave coinvolte</h2>
+<ul><li><b>Competenza alfabetica funzionale:</b> lettura e comprensione di brevi testi legati a una sequenza di azioni.</li><li><b>Competenza personale, sociale e capacità di imparare a imparare:</b> autoregolazione, gestione del tempo, fiducia nella propria autonomia.</li><li><b>Competenza digitale:</b> uso guidato del trascinamento (drag and drop) con coordinazione oculo-manuale.</li></ul>
+<p>Qui sotto la scheda con gli obiettivi, le sei tessere e le strategie di coinvolgimento.</p>
+</div></section>
+<section class="tp" id="t3" hidden><div class="card">
+<h2>Livelli di difficoltà</h2>
+<p>Tre livelli in progressione di difficoltà. Si parte dal primo e si passa al successivo quando il bambino completa la cometa con facilità e senza aiuti. Il gioco riparte con il livello scelto.</p>
+<div class="lvs">
+<button class="opb lv" data-l="1" aria-pressed="true"><b>Livello 1 · Piccoli viaggiatori</b> (5–6 anni)<br>4 tappe: Dolce Inizio, Bagno, Colazione, Si parte. I titoli delle stelle sono già visibili e l’aiuto luminoso arriva subito.<br><small>Prerequisiti: riconoscere i numeri da 1 a 4; leggere brevi parole o ascoltare con 🔊; trascinare con il dito.</small></button>
+<button class="opb lv" data-l="2" aria-pressed="false"><b>Livello 2 · Esploratori</b> (6–7 anni)<br>Tutte e 6 le tappe. I titoli compaiono solo quando il cucciolo sale e l’aiuto luminoso arriva dopo due tentativi.<br><small>Prerequisiti: numeri da 1 a 6; lettura di frasi brevi, anche con aiuto; conoscere l’ordine delle azioni della propria mattina.</small></button>
+<button class="opb lv" data-l="3" aria-pressed="false"><b>Livello 3 · Esperti della cometa</b> (7–9 anni)<br>6 tappe più 2 cuccioli “intrusi” che non fanno parte del viaggio del mattino. Nessun aiuto luminoso e nessun simbolo: bisogna leggere bene il testo e scegliere.<br><small>Prerequisiti: lettura autonoma; saper escludere ciò che non c’entra con la sequenza.</small></button>
+</div><p id="lvm"></p>
+</div></section>
+<section class="tp" id="t4" hidden><div class="card opt">
+<h2>Modalità e opzioni</h2>
+<label><input type="checkbox" id="o-read"> Leggi il testo ad alta voce quando tocco un cucciolo</label>
+<label><input type="checkbox" id="o-icons" checked> Mostra i simboli (sveglia, spazzolino, zaino…)</label>
+<label><input type="checkbox" id="o-stars" checked> Mostra le stelline che brillano nel cielo</label>
+<label><input type="checkbox" id="o-shuf" checked> Mescola i cuccioli a ogni partita</label>
+<p>Con il pulsante <b>A</b> in alto si ingrandisce il testo, con 🔊 si attiva la lettura ad alta voce.</p>
+</div></section>
+<section class="tp" id="t5" hidden>
+<div class="play"><h1>La Cometa del Dolce Inizio</h1>
+<p class="intro">Aiuta i cuccioli a salire sulla cometa, uno alla volta, nell’ordine del viaggio del mattino.</p>
+<div id="sky"><div class="moon" aria-hidden="true"></div><div class="stars" aria-hidden="true"><i style="left:28%;top:6%;font-size:14px">✦</i><i style="left:46%;top:12%;font-size:10px;animation-delay:-1s">✦</i><i style="left:60%;top:5%;font-size:16px;animation-delay:-2s">✦</i><i style="left:76%;top:14%;font-size:11px;animation-delay:-.5s">✦</i><i style="left:88%;top:7%;font-size:13px;animation-delay:-1.6s">✦</i><i style="left:18%;top:22%;font-size:9px;animation-delay:-2.4s">✦</i><i style="left:38%;top:26%;font-size:11px;animation-delay:-.8s">✦</i><i style="left:70%;top:28%;font-size:9px;animation-delay:-1.9s">✦</i><i style="left:93%;top:32%;font-size:10px;animation-delay:-2.7s">✦</i><i style="left:7%;top:38%;font-size:9px;animation-delay:-1.3s">✦</i><i style="left:54%;top:36%;font-size:8px;animation-delay:-.2s">✦</i></div><svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" id="svg"></svg></div>
+<p class="calm">Un viaggio calmo, senza fretta: ogni stella ha il suo tempo.</p>
+<p id="msg" aria-live="polite">Prendi un cucciolo e portalo su una stella.</p>
+<div class="win" id="win"><div aria-hidden="true">💖🌟✨🌟💖</div><p>Che bel viaggio, calmo e dolce! Sei calma, serena e pronta per una bellissima giornata. Ti vogliamo tanto bene! 💛</p><button class="btn" id="nx">Livello successivo ➜</button></div>
+<div class="bub" id="bub" aria-live="polite"></div>
+<div class="tray" id="tray"></div>
+<button class="btn" id="reset">Ricomincia il viaggio</button>
+
+</div></section>
+<section class="tp" id="t6" hidden><div class="card">
+<h2>Report della sessione</h2>
+<div id="rep"></div>
+<h2>Come mi sento adesso?</h2>
+<div class="chp"><button class="opb fe" data-f="felice" aria-pressed="false">😄 Felice</button><button class="opb fe" data-f="tranquillo/a" aria-pressed="false">🙂 Tranquillo/a</button><button class="opb fe" data-f="stanco/a" aria-pressed="false">😴 Stanco/a</button><button class="opb fe" data-f="agitato/a" aria-pressed="false">😣 Agitato/a</button><button class="opb fe" data-f="triste" aria-pressed="false">😢 Triste</button></div>
+<h2>Cosa mi aiuta?</h2>
+<div class="chp"><button class="opb he" data-h="un respiro lento" aria-pressed="false">🌬️ Un respiro lento</button><button class="opb he" data-h="un abbraccio" aria-pressed="false">🤗 Un abbraccio</button><button class="opb he" data-h="ripartire dalla prima stella" aria-pressed="false">⭐ Ripartire dalla prima stella</button></div>
+<p id="sum"></p>
+<p><small>I dati restano solo su questa pagina e spariscono quando la chiudi.</small></p>
+<button class="btn" id="cp">Copia il report</button> <button class="btn ghost" id="rz">Azzera</button>
+</div></section><details>
+<summary>Per gli adulti: obiettivi dell’esercizio</summary>
+<h3>Le 6 tessere e il loro scopo pratico</h3>
+<ol>
+<li><b>Il Dolce Risveglio:</b> disinnescare l’irritabilità da risveglio brusco (tempo e coccole).</li>
+<li><b>In Bagno a Prepararsi:</b> unire le micro-azioni del bagno in un unico blocco visivo, per non disperdere l’attenzione.</li>
+<li><b>La Super Colazione:</b> concentrarsi sul nutrimento in un momento protetto.</li>
+<li><b>Il Controllo dello Zaino:</b> dare senso di controllo, autonomia e sicurezza prima di uscire.</li>
+<li><b>Scarpe e Ultime Coccole:</b> l’ancora emotiva, la ricarica affettiva finale contro l’ansia da separazione.</li>
+<li><b>Si Parte per la Scuola!:</b> chiusura positiva della routine e transizione verso l’esterno.</li>
+</ol>
+<h3>Strategie di coinvolgimento</h3>
+<ul>
+<li><b>Nessun feedback punitivo:</b> se l’ordine è sbagliato, il cucciolo torna al suo posto, senza suoni d’errore né scritte rosse.</li>
+<li><b>Rinforzo visivo dell’affettività:</b> il completamento sblocca una schermata con cuori, stelline e messaggi dolci.</li>
+<li><b>Il tempo come alleato:</b> la routine è un percorso calmo, che associa il tempo al relax e non alla corsa.</li>
+</ul>
+<h3>Obiettivi principali (cognitivo e visuo-spaziale)</h3>
+<ul>
+<li><b>Organizzazione sequenziale su tracciato curvilineo:</b> ordinare gli eventi seguendo un flusso temporale dinamico (la scia della cometa) e non una griglia rigida, facilitando la transizione mentale da un’azione all’altra.</li>
+<li><b>Associazione iconico-semantica:</b> collegare il testo descrittivo del cucciolo al cerchietto corretto sul trenino del tempo, stimolando lettura funzionale e comprensione del testo.</li>
+<li><b>Interiorizzazione del “Dolce Inizio”:</b> riconoscere la prima stazione (musica e coccole) come il motore che attiva l’energia positiva per tutta la giornata.</li>
+</ul>
+<h3>Obiettivi secondari (neuropsicologico e comportamentale)</h3>
+<ul>
+<li><b>Canalizzazione dell’energia tramite il movimento circolare:</b> forme morbide e cerchietti fluttuanti, per ridurre l’ansia da prestazione e allenare la coordinazione oculo-manuale fine (trascinamento su tracciato).</li>
+<li><b>Ridurre il senso di obbligo:</b> la routine diventa un viaggio da vivere e non un ordine da eseguire (aiutare i cuccioli a salire sulla cometa), così il bambino ha meno motivo di opporsi alle regole degli adulti.</li>
+<li><b>Stabilizzazione emotiva e affettiva:</b> la stazione finale come ponte affettivo positivo (le ultime coccole) che prepara il distacco all’ingresso a scuola.</li>
+</ul>
+</details>
+</main>
+<script>
+const P=[
+{t:"Dolce Inizio",d:"Musica e coccole",e:"🐻",c:"#ffd36b"},
+{t:"Mi vesto",d:"Mi vesto con i miei vestiti",e:"🐰",c:"#8fd3ee"},
+{t:"Colazione",d:"Colazione tutti insieme",e:"🦊",c:"#f6a3bd"},
+{t:"Mi lavo",d:"Lavo i denti e la faccia",e:"🐿️",c:"#9be0a9"},
+{t:"Si parte",d:"Zaino, scarpe e giacca",e:"🦉",c:"#c3b4f5"},
+{t:"Ultime coccole",d:"Un grande abbraccio prima di salutarci",e:"🐬",c:"#ffb394"}];
+P.length=0;P.push(
+{t:"Dolce Inizio",d:"Mi stiracchio con musica dolce e abbraccio la mamma",e:"🐨",c:"#9fc5f8"},
+{t:"Il Bagno",d:"Mi lavo il musetto e i denti, vestiti pronti",e:"🦝",c:"#c9b3f2"},
+{t:"La Colazione",d:"Mangio con calma latte e miele",e:"🐻",c:"#ffd36b"},
+{t:"Lo Zaino",d:"Controllo matite e quaderni nello zaino",e:"🐿️",c:"#ffb394"},
+{t:"Le Scarpe",d:"Allaccio le scarpe e ricevo un grande abbraccio",e:"🐧",c:"#8fd3ee"},
+{t:"Il Salto",d:"Cammino verso scuola con un grande sorriso",e:"🦊",c:"#f6a3bd"});
+P.length=0;P.push(
+{t:"Dolce Inizio",d:"Il Dolce Risveglio",x:"Suona la musica dolce. Ho 15 minuti tutti per me e per le coccole con mamma e papà prima di alzarmi.",e:"🐨",c:"#9fc5f8"},
+{t:"In Bagno",d:"In Bagno a Prepararsi",x:"Vado in bagno: faccio la pipì, tolgo il pigiama, mi lavo la faccia e i denti e indosso i miei vestiti.",e:"🦝",c:"#c9b3f2"},
+{t:"Colazione",d:"La Super Colazione",x:"Mangio una buona colazione a tavola per fare il pieno di energia, con calma e senza fretta.",e:"🐻",c:"#ffd36b"},
+{t:"Lo Zaino",d:"Il Controllo dello Zaino",x:"Guardo il mio zaino: è tutto pronto e a posto per la scuola!",e:"🐿️",c:"#ffb394"},
+{t:"Scarpe e coccole",d:"Scarpe e Ultime Coccole",x:"Infilo le scarpe e la giacca. Faccio l’ultimo pieno di abbracci e baci con i genitori.",e:"🐧",c:"#8fd3ee"},
+{t:"Si parte!",d:"Si Parte per la Scuola!",x:"Esco di casa con il sorriso. Sono calma, serena e pronta per una bellissima giornata.",e:"🦊",c:"#f6a3bd"});
+const IC=["⏰","🪥","🥛","🎒","👟","🏫"];
+P.push({t:"",d:"Guardo la tv",x:"Guardo i cartoni animati alla tv.",e:"🐸",c:"#c8e6a0"},{t:"",d:"Gioco",x:"Gioco con i miei giochi sul tappeto.",e:"🦔",c:"#e0c9a6"});
+IC.push("📺","🧸");
+function say(i){const b=$("#bub");b.textContent="";const s=document.createElement("span");s.textContent=IC[i]+" "+P[i].x;const k=document.createElement("button");k.className="spk";k.textContent="🔊 Ascolta";
+ k.onclick=()=>{try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(P[i].x);u.lang="it-IT";u.rate=.85;speechSynthesis.speak(u)}catch(e){}};b.append(s,k);if(opt.read)k.click()}
+const XY4=[[14,80],[38,52],[62,66],[86,24]];let PT;const SQ=()=>lvl===1?[0,1,2,5]:[0,1,2,3,4,5];
+const XY=[[14,82],[30,56],[46,76],[60,40],[76,62],[87,22]];
+const $=s=>document.querySelector(s);
+let lit=[],sel=null,tries={};
+const sky=$("#sky"),svg=$("#svg"),tray=$("#tray");
+function seg(i){const n=PT.length-1;const a=PT[Math.max(i-1,0)],b=PT[i],c=PT[i+1],d=PT[Math.min(i+2,n)];
+ const c1=[b[0]+(c[0]-a[0])/6,b[1]+(c[1]-a[1])/6],c2=[c[0]-(d[0]-b[0])/6,c[1]-(d[1]-b[1])/6];
+ return"M"+b+" C"+c1+" "+c2+" "+c}
+function build(){PT=lvl===1?XY4:XY;lit=[];sel=null;tries={};$("#win").classList.remove("on");
+ svg.innerHTML=PT.slice(0,-1).map((_,i)=>'<path class="seg" id="g'+i+'" d="'+seg(i)+'" vector-effect="non-scaling-stroke"/>').join("");
+ sky.querySelectorAll(".st,.lab").forEach(n=>n.remove());
+ PT.forEach((p,i)=>{const b=document.createElement("button");b.className="st";b.dataset.i=i;b.style.left=p[0]+"%";b.style.top=p[1]+"%";
+  b.textContent=i+1;b.setAttribute("aria-label","Stella "+(i+1));b.onclick=()=>{if(sel!==null)place(sel,i)};sky.append(b);
+  const l=document.createElement("div");l.className="lab";l.id="l"+i;l.style.left=p[0]+"%";l.style.top="calc("+p[1]+"% + min(11%,48px))";
+  if(i===0||lvl===1)l.textContent=P[SQ()[i]].t;sky.append(l)});
+ const order=[...SQ(),...(lvl===3?[6,7]:[])];if(opt.shuf)order.sort(()=>Math.random()-.5);
+ tray.innerHTML="";order.forEach(i=>tray.append(pup(i)));
+ $("#msg").textContent="Prendi un cucciolo e portalo su una stella.";$("#bub").textContent="Tocca un cucciolo per leggere la sua storia."}
+function pup(i){const b=document.createElement("button");b.className="pup";b.dataset.i=i;
+ b.innerHTML='<span class="in"><span class="c" style="background:'+P[i].c+'">'+P[i].e+'<span class="bd" aria-hidden="true">'+IC[i]+'</span></span><small>'+P[i].d+'</small></span>';
+ let sx,sy,mv=false,dn=false;
+ b.onpointerdown=e=>{say(i);dn=true;mv=false;sx=e.clientX;sy=e.clientY;b.setPointerCapture(e.pointerId);b.style.transition="none";b.style.zIndex=10};
+ b.onpointermove=e=>{if(!dn)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>8)mv=true;if(mv)b.style.transform="translate("+dx+"px,"+dy+"px) scale(1.1)"};
+ b.onpointerup=e=>{if(!dn)return;dn=false;b.style.transition="transform .4s";
+  if(mv){const r=b.querySelector(".c").getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;let best=-1,bd=1e9;
+   sky.querySelectorAll(".st").forEach(s=>{const q=s.getBoundingClientRect(),d=Math.hypot(q.left+q.width/2-cx,q.top+q.height/2-cy);if(d<bd){bd=d;best=+s.dataset.i}});
+   b.style.transform="";b.style.zIndex="";if(bd<Math.max(70,0))place(i,best);}
+  else{b.style.transform="";b.style.zIndex="";sel=sel===i?null:i;tray.querySelectorAll(".pup").forEach(x=>x.classList.toggle("sel",+x.dataset.i===sel))}};
+ b.onpointercancel=()=>{dn=false;b.style.transform="";b.style.zIndex=""};
+ b.onkeydown=e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();say(i);sel=sel===i?null:i;tray.querySelectorAll(".pup").forEach(x=>x.classList.toggle("sel",+x.dataset.i===sel))}};
+ return b}
+function place(p,s){if(lit.includes(s))return;
+ if(p===SQ()[s]){stat.ok++;lit.push(s);const st=sky.querySelectorAll(".st")[s];st.classList.add("lit");st.textContent=P[p].e;const bd=document.createElement("span");bd.className="bd";bd.textContent=IC[p];st.append(bd);st.style.background=P[p].c;st.style.borderColor="#fff";
+  $("#l"+s).textContent=P[p].t;tray.querySelector('.pup[data-i="'+p+'"]').remove();sel=null;$("#bub").textContent="Scegli il prossimo cucciolo.";
+  for(let k=0;k<PT.length-1;k++)if(lit.includes(k)&&lit.includes(k+1))$("#g"+k).classList.add("lit");
+  if(lit.length===PT.length){stat.rounds++;$("#nx").hidden=lvl>=3;$("#msg").textContent="La cometa è accesa! Buon viaggio e buona giornata!";$("#win").classList.add("on")}
+  else $("#msg").textContent="Che bello, "+P[p].e+" è salito sulla cometa!"}
+ else{stat.err++;tries[p]=(tries[p]||0)+1;sel=null;tray.querySelectorAll(".pup").forEach(x=>x.classList.remove("sel"));
+  $("#msg").textContent=p>5?"Questo cucciolo non fa parte del viaggio del mattino: lo lasciamo riposare.":"Quasi! Proviamo con un’altra stella.";
+  if(tries[p]>=HA()){stat.hint++;const h=sky.querySelectorAll(".st")[SQ().indexOf(p)];h.classList.remove("hint");void h.offsetWidth;h.classList.add("hint");$("#msg").textContent="Guarda, questa stella brilla: prova qui!"}}}
+const LV=["","Livello 1 · Piccoli viaggiatori (5–6 anni)","Livello 2 · Esploratori (6–7 anni)","Livello 3 · Esperti della cometa (7–9 anni)"];
+let lvl=1;const opt={read:false,icons:true,stars:true,shuf:true};
+const stat={ok:0,err:0,hint:0,rounds:0};let feel="",helps=[];
+const HA=()=>lvl===1?1:lvl===2?2:99;
+const TABS=["Descrizione e Prerequisiti","Obiettivi e Competenze","Livelli di Difficoltà","Modalità e Opzioni","GIOCO INTERATTIVO","Report e Autoregolazione"];
+function tab(n){const bs=document.querySelectorAll("#tabs button");TABS.forEach((_,i)=>{$("#t"+(i+1)).hidden=i!==n;bs[i].setAttribute("aria-selected",i===n)});if(n===5)rep();window.scrollTo(0,0)}
+$("#tabs").innerHTML=TABS.map((t,i)=>'<button role="tab" class="'+(i===4?"gm":"")+'" aria-selected="'+(i===0)+'">'+(i+1)+". "+t+"</button>").join("");
+document.querySelectorAll("#tabs button").forEach((b,i)=>b.onclick=()=>tab(i));
+const dt=document.querySelector("details");$("#t2").append(dt);dt.open=true;
+document.querySelectorAll(".lv").forEach(b=>b.onclick=()=>{lvl=+b.dataset.l;document.querySelectorAll(".lv").forEach(x=>x.setAttribute("aria-pressed",x===b));build();applyOpt();$("#lvm").textContent="Impostato: "+LV[lvl]+". Vai al gioco per provarlo."});
+function applyOpt(){document.body.classList.toggle("noicons",!opt.icons||lvl===3);document.body.classList.toggle("nostars",!opt.stars);$("#hsp").setAttribute("aria-pressed",opt.read);$("#o-read").checked=opt.read}
+["read","icons","stars","shuf"].forEach(k=>$("#o-"+k).onchange=e=>{opt[k]=e.target.checked;applyOpt();if(k==="shuf")build()});
+$("#hsp").onclick=()=>{opt.read=!opt.read;applyOpt()};
+let fs=0;$("#hfs").onclick=()=>{fs=(fs+1)%3;document.documentElement.style.fontSize=["100%","115%","130%"][fs]};
+function rep(){$("#rep").innerHTML="<ul><li>Livello: <b>"+LV[lvl]+"</b></li><li>Percorsi completati: <b>"+stat.rounds+"</b></li><li>Cuccioli saliti sulla cometa: <b>"+stat.ok+"</b></li><li>Prove in più (ogni prova aiuta a ragionare): <b>"+stat.err+"</b></li><li>Aiuti luminosi usati: <b>"+stat.hint+"</b></li></ul>";
+ $("#sum").textContent=(feel?"Oggi mi sento "+feel+". ":"")+(helps.length?"Per stare bene scelgo: "+helps.join(", ")+".":"")}
+document.querySelectorAll(".fe").forEach(b=>b.onclick=()=>{feel=b.dataset.f;document.querySelectorAll(".fe").forEach(x=>x.setAttribute("aria-pressed",x===b));rep()});
+document.querySelectorAll(".he").forEach(b=>b.onclick=()=>{const v=b.dataset.h,i=helps.indexOf(v);if(i<0)helps.push(v);else helps.splice(i,1);b.setAttribute("aria-pressed",i<0);rep()});
+$("#cp").onclick=async()=>{const t=$("#rep").innerText+"\n"+$("#sum").textContent;try{await navigator.clipboard.writeText(t);$("#cp").textContent="Copiato"}catch(e){$("#cp").textContent="Seleziona e copia a mano"}};
+$("#rz").onclick=()=>{stat.ok=stat.err=stat.hint=stat.rounds=0;feel="";helps=[];document.querySelectorAll(".fe,.he").forEach(x=>x.setAttribute("aria-pressed","false"));rep()};
+applyOpt();
+$("#nx").onclick=()=>{lvl=Math.min(lvl+1,3);document.querySelectorAll(".lv").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.l===lvl));build();applyOpt();$("#lvm").textContent="Impostato: "+LV[lvl]+"."};
+$("#reset").onclick=build;build();
+</script>
+</body>
+</html>
