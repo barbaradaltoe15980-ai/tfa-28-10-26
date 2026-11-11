@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Digita con gli Animali</title>
+<style>
+:root{
+  --bg:#f4efe2; --card:#fffdf7; --ink:#2f3a2c; --muted:#6e7a68; --line:#e2dccb;
+  --green:#3f7d4e; --green-2:#5fa36f; --green-soft:#e3f0e3;
+  --sand:#e8b45a; --sand-soft:#fbefd6; --red:#c94a3a; --red-soft:#fbe1dc;
+  --sky:#cfe7ef; --radius:18px;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Nunito","Trebuchet MS","Segoe UI",system-ui,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer}
+input,select{font:inherit}
+.wrap{max-width:1000px;margin:0 auto;padding:20px 16px 40px}
+header.top{display:flex;align-items:center;gap:12px;margin-bottom:18px}
+header.top .logo{font-size:40px;line-height:1}
+header.top h1{margin:0;font-size:clamp(22px,4vw,32px);letter-spacing:.3px}
+header.top p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.card{background:var(--card);border:2px solid var(--line);border-radius:var(--radius);padding:22px;box-shadow:0 4px 0 var(--line)}
+.hidden{display:none!important}
+h2{margin:0 0 14px;font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+label.f{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:14px}
+label.f input,label.f select{padding:11px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:16px}
+label.f input:focus,label.f select:focus{outline:none;border-color:var(--green-2)}
+.section-title{margin:22px 0 10px;font-weight:800;font-size:16px}
+.avatars{display:flex;flex-wrap:wrap;gap:10px}
+.avatar{width:66px;height:66px;font-size:36px;border-radius:16px;border:3px solid var(--line);background:#fff;display:grid;place-items:center;transition:transform .15s}
+.avatar:hover{transform:translateY(-2px)}
+.avatar.sel{border-color:var(--green);background:var(--green-soft);transform:scale(1.06)}
+.levels{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+.level{text-align:left;padding:14px;border-radius:14px;border:3px solid var(--line);background:#fff;color:var(--ink)}
+.level b{display:block;font-size:16px}
+.level span{font-size:13px;color:var(--muted)}
+.level .em{font-size:26px;float:right}
+.level.sel{border-color:var(--green);background:var(--green-soft)}
+.opts{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:14px}
+.opts label{display:flex;align-items:center;gap:8px}
+.btn{border:none;border-radius:14px;padding:12px 20px;font-weight:800;font-size:16px;background:var(--green);color:#fff;box-shadow:0 4px 0 #2c5937}
+.btn:active{transform:translateY(2px);box-shadow:0 2px 0 #2c5937}
+.btn.sec{background:#fff;color:var(--ink);border:2px solid var(--line);box-shadow:0 4px 0 var(--line)}
+.btn.sand{background:var(--sand);color:#3b2a0b;box-shadow:0 4px 0 #b9862f}
+.btn.small{padding:8px 12px;font-size:14px;border-radius:10px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.err{color:var(--red);font-weight:700;font-size:14px;margin-top:10px}
+
+/* GAME */
+.gamebar{display:flex;flex-wrap:wrap;gap:14px;align-items:stretch;margin-bottom:14px}
+.who{display:flex;align-items:center;gap:10px;flex:1 1 220px}
+.who .av{font-size:44px}
+.who b{font-size:18px;display:block}
+.who small{color:var(--muted)}
+.timerbox{display:flex;align-items:center;gap:14px;background:var(--sand-soft);border:2px solid #f0d7a6;border-radius:16px;padding:10px 14px}
+.timerbox .time{font-size:34px;font-weight:900;font-variant-numeric:tabular-nums;min-width:96px;text-align:center}
+.timerbox .ctrls{display:flex;flex-direction:column;gap:6px}
+.timerbox .row{display:flex;gap:6px}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stat{background:#fff;border:2px solid var(--line);border-radius:14px;padding:8px 14px;text-align:center;min-width:92px}
+.stat .v{font-size:24px;font-weight:900;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12px;color:var(--muted);font-weight:700}
+.track{position:relative;height:64px;border-radius:16px;background:linear-gradient(#cfe7ef 0 55%,#9fcf85 55% 100%);overflow:hidden;border:2px solid var(--line);margin-bottom:14px}
+.track .runner{position:absolute;bottom:6px;font-size:38px;transition:left .25s ease;transform:scaleX(-1)}
+.track .goal{position:absolute;right:10px;bottom:8px;font-size:30px}
+.track .laps{position:absolute;left:10px;top:4px;font-size:16px;font-weight:800}
+.textbox{background:#fff;border:3px dashed var(--green-2);border-radius:var(--radius);padding:26px 18px;min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;outline:none}
+.textbox.focus{border-style:solid}
+.line{font-family:"Consolas","Courier New",monospace;font-size:clamp(24px,4.6vw,40px);letter-spacing:2px;line-height:1.4;word-break:break-word}
+.line .c{border-bottom:4px solid transparent;padding:0 1px}
+.line .done{color:var(--green)}
+.line .cur{background:var(--sand-soft);border-bottom-color:var(--sand);border-radius:4px}
+.line .wrong{background:var(--red-soft);border-bottom-color:var(--red);animation:shake .25s}
+.line .sp{color:#c9c2ae}
+.next{font-family:"Consolas","Courier New",monospace;color:#b7b09c;font-size:20px}
+.hint{color:var(--muted);font-size:15px;font-weight:700}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+
+.kb{margin-top:16px;display:flex;flex-direction:column;gap:6px;align-items:center;user-select:none}
+.kb .r{display:flex;gap:6px}
+.key{min-width:clamp(22px,5.4vw,46px);height:clamp(30px,5.4vw,46px);border-radius:9px;display:grid;place-items:center;font-weight:800;font-size:clamp(11px,1.8vw,16px);border:2px solid rgba(0,0,0,.08);color:#2f3a2c;position:relative}
+.key.space{min-width:clamp(160px,40vw,330px)}
+.key.home::after{content:"";position:absolute;bottom:4px;width:10px;height:2px;background:#2f3a2c;border-radius:2px;opacity:.6}
+.key.next-k{outline:4px solid var(--sand);outline-offset:1px;transform:translateY(-2px);box-shadow:0 0 0 7px rgba(232,180,90,.25)}
+.key.bad{outline:4px solid var(--red)}
+.f-lp{background:#f6c9d0}.f-la{background:#fbe0b5}.f-lm{background:#f9f1b0}.f-li{background:#c9ecc4}
+.f-ri{background:#c6e2f3}.f-rm{background:#dccff2}.f-ra{background:#f3d1ea}.f-rp{background:#e3e3e3}.f-th{background:#efe8d8}
+.legend{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:10px;font-size:12px;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.legend i{width:14px;height:14px;border-radius:4px;display:inline-block}
+
+/* Hourglass */
+.hg{width:46px;height:70px}
+.hg.run{animation:none}
+.hg.flip{animation:flip .6s ease}
+@keyframes flip{from{transform:rotate(0)}to{transform:rotate(180deg)}}
+
+/* RESULTS */
+.res-head{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.badge{font-size:72px;line-height:1}
+.res-head h2{margin:0}
+.res-head p{margin:4px 0 0;color:var(--muted)}
+.big{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:14px 0}
+.big .stat .v{font-size:30px}
+table{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+th{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.4px}
+.tablewrap{overflow-x:auto}
+.missed{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.missed span{background:var(--red-soft);border-radius:8px;padding:4px 9px;font-weight:800;font-family:monospace;font-size:15px}
+.note{width:100%;min-height:70px;border:2px solid var(--line);border-radius:12px;padding:10px;font:inherit;resize:vertical}
+.foot{margin-top:18px;text-align:center;color:var(--muted);font-size:12px}
+@media (max-width:640px){
+  .card{padding:16px}
+  .timerbox{width:100%;justify-content:space-between}
+  .stats{width:100%}
+  .stat{flex:1;min-width:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">🐾</div>
+    <div>
+      <h1>Digita con gli Animali</h1>
+      <p>Impara a scrivere veloce sulla tastiera insieme al tuo animale guida</p>
+    </div>
+  </header>
+
+  <!-- 1. SCHEDA BAMBINO -->
+  <section id="s-profile" class="card">
+    <h2>📋 Scheda del bambino</h2>
+    <div class="grid">
+      <label class="f">Nome *<input id="p-nome" autocomplete="off"></label>
+      <label class="f">Cognome *<input id="p-cognome" autocomplete="off"></label>
+      <label class="f">Classe *<input id="p-classe" placeholder="es. 3ª B" autocomplete="off"></label>
+      <label class="f">Età<input id="p-eta" type="number" min="4" max="14" autocomplete="off"></label>
+      <label class="f">Scuola<input id="p-scuola" autocomplete="off"></label>
+      <label class="f">Insegnante<input id="p-insegnante" autocomplete="off"></label>
+      <label class="f">Data<input id="p-data" type="date"></label>
+    </div>
+
+    <div class="section-title">Scegli il tuo animale guida</div>
+    <div class="avatars" id="avatars"></div>
+
+    <div class="section-title">Scegli il percorso</div>
+    <div class="levels" id="levels"></div>
+
+    <div class="section-title">⏳ Clessidra</div>
+    <div class="timerbox" style="display:inline-flex">
+      <svg class="hg" viewBox="0 0 46 70" aria-hidden="true">
+        <path d="M5 3h36M5 67h36" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
+        <path d="M9 6 C9 24 21 30 21 35 C21 40 9 46 9 64 H37 C37 46 25 40 25 35 C25 30 37 24 37 6Z" fill="#fff" stroke="#8a5a2b" stroke-width="2"/>
+        <path d="M12 12 H34 C33 24 25 29 23 33 C21 29 13 24 12 12Z" fill="#e8b45a"/>
+        <path d="M14 62 H32 C31 55 26 51 23 50 C20 51 15 55 14 62Z" fill="#e8b45a" opacity=".5"/>
+      </svg>
+      <div class="time" id="pre-time">1:00</div>
+      <div class="ctrls">
+        <div class="row">
+          <button class="btn small sec" data-adj="-15">− 15s</button>
+          <button class="btn small sec" data-adj="15">+ 15s</button>
+        </div>
+        <div class="row">
+          <button class="btn small sec" data-preset="30">30s</button>
+          <button class="btn small sec" data-preset="60">1 min</button>
+          <button class="btn small sec" data-preset="120">2 min</button>
+          <button class="btn small sec" data-preset="180">3 min</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="opts">
+      <label><input type="checkbox" id="o-case" checked> Ignora maiuscole/minuscole</label>
+      <label><input type="checkbox" id="o-kb" checked> Mostra la tastiera colorata</label>
+      <label><input type="checkbox" id="o-sound" checked> Suoni</label>
+    </div>
+
+    <div class="err hidden" id="p-err">Compila nome, cognome e classe per iniziare.</div>
+    <div class="actions">
+      <button class="btn" id="b-start">Andiamo! 🐾</button>
+    </div>
+  </section>
+
+  <!-- 2. GIOCO -->
+  <section id="s-game" class="hidden">
+    <div class="gamebar">
+      <div class="who card" style="padding:12px 16px">
+        <div class="av" id="g-av">🦊</div>
+        <div><b id="g-name">—</b><small id="g-level">—</small></div>
+      </div>
+      <div class="timerbox">
+        <svg class="hg" id="hg" viewBox="0 0 46 70" aria-hidden="true">
+          <defs>
+            <clipPath id="clipTop"><rect id="sandTopClip" x="0" y="12" width="46" height="23"/></clipPath>
+            <clipPath id="clipBot"><rect id="sandBotClip" x="0" y="64" width="46" height="0"/></clipPath>
+          </defs>
+          <path d="M5 3h36M5 67h36" stroke="#8a5a2b" stroke-width="5" stroke-linecap="round"/>
+          <path d="M9 6 C9 24 21 30 21 35 C21 40 9 46 9 64 H37 C37 46 25 40 25 35 C25 30 37 24 37 6Z" fill="#fff" stroke="#8a5a2b" stroke-width="2"/>
+          <path clip-path="url(#clipTop)" d="M11 8 H35 C35 24 25 29 23 34 C21 29 11 24 11 8Z" fill="#e8b45a"/>
+          <path clip-path="url(#clipBot)" d="M11 63 C11 47 21 41 23 37 C25 41 35 47 35 63Z" fill="#e8b45a"/>
+          <line id="stream" x1="23" y1="34" x2="23" y2="62" stroke="#e8b45a" stroke-width="1.5" opacity="0"/>
+        </svg>
+        <div class="time" id="g-time">1:00</div>
+        <div class="ctrls">
+          <div class="row">
+            <button class="btn small sec" data-gadj="-15">− 15s</button>
+            <button class="btn small sec" data-gadj="15">+ 15s</button>
+          </div>
+          <div class="row">
+            <button class="btn small sec" id="b-pause">⏸ Pausa</button>
+            <button class="btn small sec" id="b-reset">↺ Azzera</button>
+          </div>
+        </div>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="v" id="st-wpm">0</div><div class="l">parole/min</div></div>
+        <div class="stat"><div class="v" id="st-acc">100%</div><div class="l">precisione</div></div>
+        <div class="stat"><div class="v" id="st-err">0</div><div class="l">errori</div></div>
+      </div>
+    </div>
+
+    <div class="track" id="track">
+      <div class="laps" id="laps"></div>
+      <div class="runner" id="runner" style="left:8px">🦊</div>
+      <div class="goal">🏁</div>
+    </div>
+
+    <div class="textbox card" id="textbox" tabindex="0">
+      <div class="line" id="line"></div>
+      <div class="next" id="next"></div>
+      <div class="hint" id="hint">Premi il primo tasto per far partire la clessidra ⏳</div>
+    </div>
+
+    <div id="kbwrap">
+      <div class="kb" id="kb"></div>
+      <div class="legend">
+        <span><i class="f-lp"></i>mignolo sx</span><span><i class="f-la"></i>anulare sx</span>
+        <span><i class="f-lm"></i>medio sx</span><span><i class="f-li"></i>indice sx</span>
+        <span><i class="f-th"></i>pollici</span>
+        <span><i class="f-ri"></i>indice dx</span><span><i class="f-rm"></i>medio dx</span>
+        <span><i class="f-ra"></i>anulare dx</span><span><i class="f-rp"></i>mignolo dx</span>
+      </div>
+    </div>
+
+    <div class="actions" style="justify-content:center">
+      <button class="btn sec" id="b-stop">Termina ora</button>
+      <button class="btn sec" id="b-back">← Torna alla scheda</button>
+    </div>
+  </section>
+
+  <!-- 3. RISULTATI -->
+  <section id="s-result" class="card hidden">
+    <div class="res-head">
+      <div class="badge" id="r-badge">🐢</div>
+      <div>
+        <h2 id="r-title">Bravo!</h2>
+        <p id="r-sub"></p>
+      </div>
+    </div>
+    <div class="big">
+      <div class="stat"><div class="v" id="r-wpm">0</div><div class="l">parole al minuto</div></div>
+      <div class="stat"><div class="v" id="r-cpm">0</div><div class="l">caratteri al minuto</div></div>
+      <div class="stat"><div class="v" id="r-acc">0%</div><div class="l">precisione</div></div>
+      <div class="stat"><div class="v" id="r-words">0</div><div class="l">parole completate</div></div>
+      <div class="stat"><div class="v" id="r-err">0</div><div class="l">errori</div></div>
+    </div>
+    <div id="r-missed-wrap">
+      <b>Tasti da allenare</b>
+      <div class="missed" id="r-missed"></div>
+    </div>
+
+    <div class="section-title">Tutte le prove di oggi</div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>#</th><th>Ora</th><th>Percorso</th><th>Durata</th><th>Parole/min</th><th>Precisione</th><th>Errori</th><th>Animale</th></tr></thead>
+        <tbody id="r-rows"></tbody>
+      </table>
+    </div>
+
+    <div class="section-title">Note dell'insegnante (finiscono nel report)</div>
+    <textarea class="note" id="r-note" placeholder="Osservazioni, postura, progressi…"></textarea>
+
+    <div class="actions">
+      <button class="btn" id="b-again">🔁 Gioca ancora</button>
+      <button class="btn sec" id="b-change">Cambia percorso o tempo</button>
+      <button class="btn sand" id="b-report">⬇ Scarica il report</button>
+      <button class="btn sec" id="b-new">👤 Nuovo bambino</button>
+    </div>
+  </section>
+
+  <div class="foot">Funziona anche senza internet · i dati restano su questo computer finché la pagina è aperta</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- Dati ---------- */
+const ANIMALS = [
+  {e:"🦊",n:"Volpe"},{e:"🐼",n:"Panda"},{e:"🦁",n:"Leone"},{e:"🐢",n:"Tartaruga"},
+  {e:"🐬",n:"Delfino"},{e:"🦉",n:"Gufo"},{e:"🐰",n:"Coniglio"},{e:"🐸",n:"Rana"},
+  {e:"🦒",n:"Giraffa"},{e:"🐘",n:"Elefante"},{e:"🐧",n:"Pinguino"},{e:"🐿️",n:"Scoiattolo"}
+];
+const LEVELS = [
+  {id:1,em:"🐜",name:"Il sentiero della formica",desc:"Tasti base: a s d f – j k l ò",type:"keys",keys:"asdfjklò"},
+  {id:2,em:"🐞",name:"Il prato della coccinella",desc:"Tasti base + g h e lettere vicine",type:"keys",keys:"asdfghjklòeiru"},
+  {id:3,em:"🐱",name:"Parole corte",desc:"gatto, cane, rana, ape…",type:"words",list:"gatto cane rana ape orso lupo topo foca gufo oca mucca capra volpe lince tigre leone zebra panda koala pesce riccio asino merlo talpa bruco lepre cervo pony alce".split(" ")},
+  {id:4,em:"🐘",name:"Parole lunghe",desc:"elefante, giraffa, farfalla…",type:"words",list:"elefante giraffa coccodrillo farfalla scoiattolo pinguino ippopotamo rinoceronte tartaruga cavalluccio delfino canguro gorilla fenicottero camaleonte pipistrello porcospino libellula coccinella balena cammello struzzo pellicano gabbiano formichiere".split(" ")},
+  {id:5,em:"🦁",name:"Frasi della savana",desc:"Frasi brevi sugli animali",type:"sentences",list:[
+    "il gatto dorme sul divano","la volpe corre nel bosco","il delfino salta tra le onde",
+    "la tartaruga va piano ma arriva","il gufo vede anche di notte","le api fanno il miele",
+    "il leone è il re della savana","la rana salta nello stagno","il pinguino nuota nel mare freddo",
+    "lo scoiattolo raccoglie le ghiande","la giraffa mangia le foglie alte","il lupo ulula alla luna",
+    "la farfalla vola sui fiori","il cane gioca con la palla","la balena canta nel mare",
+    "il riccio si chiude a palla","la mucca mangia l'erba del prato","il pappagallo ripete le parole"]}
+];
+const BADGES = [
+  {min:0,e:"🐢",n:"Tartaruga",t:"Piano piano si va lontano!"},
+  {min:5,e:"🐰",n:"Coniglio",t:"Che bei saltelli sulla tastiera!"},
+  {min:10,e:"🦊",n:"Volpe",t:"Veloce e furbo come una volpe!"},
+  {min:15,e:"🐎",n:"Cavallo",t:"Stai galoppando!"},
+  {min:20,e:"🐆",n:"Ghepardo",t:"Velocissimo, come un ghepardo!"}
+];
+
+/* Tastiera italiana con dita */
+const KB_ROWS = [
+  [["\\","lp"],["1","lp"],["2","la"],["3","lm"],["4","li"],["5","li"],["6","ri"],["7","ri"],["8","rm"],["9","ra"],["0","rp"],["'","rp"],["ì","rp"]],
+  [["q","lp"],["w","la"],["e","lm"],["r","li"],["t","li"],["y","ri"],["u","ri"],["i","rm"],["o","ra"],["p","rp"],["è","rp"],["+","rp"]],
+  [["a","lp"],["s","la"],["d","lm"],["f","li"],["g","li"],["h","ri"],["j","ri"],["k","rm"],["l","ra"],["ò","rp"],["à","rp"],["ù","rp"]],
+  [["<","lp"],["z","lp"],["x","la"],["c","lm"],["v","li"],["b","li"],["n","ri"],["m","ri"],[",","rm"],[".","ra"],["-","rp"]],
+  [[" ","th"]]
+];
+
+/* ---------- Stato ---------- */
+const $ = id => document.getElementById(id);
+let profile = null;
+let avatar = ANIMALS[0];
+let level = LEVELS[0];
+let duration = 60;
+let rounds = [];
+let G = null; // stato partita
+
+function fmt(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+":"+String(s%60).padStart(2,"0");}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function rnd(a){return a[Math.floor(Math.random()*a.length)];}
+
+/* ---------- Scheda ---------- */
+$("p-data").value = new Date().toISOString().slice(0,10);
+function renderAvatars(){
+  $("avatars").innerHTML = ANIMALS.map((a,i)=>`<button class="avatar ${a===avatar?"sel":""}" data-i="${i}" title="${a.n}" aria-label="${a.n}">${a.e}</button>`).join("");
+}
+function renderLevels(){
+  $("levels").innerHTML = LEVELS.map((l,i)=>`<button class="level ${l===level?"sel":""}" data-i="${i}"><span class="em">${l.em}</span><b>${i+1}. ${l.name}</b><span>${l.desc}</span></button>`).join("");
+}
+$("avatars").addEventListener("click",e=>{const b=e.target.closest(".avatar");if(!b)return;avatar=ANIMALS[+b.dataset.i];renderAvatars();});
+$("levels").addEventListener("click",e=>{const b=e.target.closest(".level");if(!b)return;level=LEVELS[+b.dataset.i];renderLevels();});
+document.querySelectorAll("[data-adj]").forEach(b=>b.addEventListener("click",()=>{setDuration(duration+ +b.dataset.adj);}));
+document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{setDuration(+b.dataset.preset);}));
+function setDuration(d){duration=Math.min(600,Math.max(15,d));$("pre-time").textContent=fmt(duration);}
+renderAvatars();renderLevels();
+
+function readProfile(){
+  return {
+    nome:$("p-nome").value.trim(), cognome:$("p-cognome").value.trim(), classe:$("p-classe").value.trim(),
+    eta:$("p-eta").value.trim(), scuola:$("p-scuola").value.trim(), insegnante:$("p-insegnante").value.trim(),
+    data:$("p-data").value
+  };
+}
+$("b-start").addEventListener("click",()=>{
+  const p = readProfile();
+  if(!p.nome||!p.cognome||!p.classe){$("p-err").classList.remove("hidden");return;}
+  $("p-err").classList.add("hidden");
+  const same = profile && profile.nome===p.nome && profile.cognome===p.cognome;
+  if(!same) rounds = [];
+  profile = p;
+  startGame();
+});
+
+function show(id){["s-profile","s-game","s-result"].forEach(s=>$(s).classList.toggle("hidden",s!==id));window.scrollTo(0,0);}
+
+/* ---------- Tastiera ---------- */
+function renderKB(){
+  $("kb").innerHTML = KB_ROWS.map(r=>`<div class="r">${r.map(([k,f])=>{
+    const home = (k==="f"||k==="j")?" home":"";
+    return `<div class="key f-${f}${k===" "?" space":""}${home}" data-k="${esc(k)}">${k===" "?"spazio":esc(k)}</div>`;
+  }).join("")}</div>`).join("");
+}
+function keyEl(ch){
+  const k = ch.toLowerCase();
+  return [...document.querySelectorAll(".key")].find(el=>el.dataset.k===k);
+}
+function markNextKey(){
+  document.querySelectorAll(".key.next-k").forEach(el=>el.classList.remove("next-k"));
+  if(!G) return;
+  const ch = G.line[G.pos];
+  if(ch!==undefined){const el=keyEl(ch); if(el) el.classList.add("next-k");}
+}
+function flashBad(ch){
+  const el = keyEl(ch); if(!el) return;
+  el.classList.add("bad"); setTimeout(()=>el.classList.remove("bad"),250);
+}
+
+/* ---------- Generazione testo ---------- */
+function makeLine(){
+  const L = level, parts=[]; let len=0;
+  if(L.type==="sentences"){
+    let s = rnd(L.list);
+    if(G && G.lastSentence===s) s = rnd(L.list);
+    if(G) G.lastSentence = s;
+    return s;
+  }
+  const target = 26;
+  while(len<target){
+    let w;
+    if(L.type==="keys"){
+      const n = 2+Math.floor(Math.random()*3);
+      w = Array.from({length:n},()=>rnd(L.keys.split(""))).join("");
+    } else {
+      w = rnd(L.list);
+      if(parts[parts.length-1]===w) continue;
+    }
+    parts.push(w); len += w.length+1;
+  }
+  return parts.join(" ");
+}
+
+/* ---------- Suoni ---------- */
+let actx=null;
+function beep(freq,dur,type){
+  if(!$("o-sound").checked) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type||"sine"; o.frequency.value=freq; g.gain.value=.06;
+    o.connect(g); g.connect(actx.destination);
+    o.start(); g.gain.exponentialRampToValueAtTime(.0001,actx.currentTime+dur); o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+
+/* ---------- Partita ---------- */
+function startGame(){
+  G = {
+    total:duration, left:duration, running:false, paused:false, finished:false,
+    started:null, elapsed:0, lastTick:0,
+    line:"", pos:0, nextLine:"", wrongAt:-1,
+    correct:0, errors:0, words:0, missed:{}, laps:0, lastSentence:null
+  };
+  G.line = makeLine(); G.nextLine = makeLine();
+  $("g-av").textContent = avatar.e; $("runner").textContent = avatar.e;
+  $("g-name").textContent = profile.nome+" "+profile.cognome+" · "+profile.classe;
+  $("g-level").textContent = level.em+" "+level.name;
+  $("kbwrap").classList.toggle("hidden",!$("o-kb").checked);
+  $("b-pause").textContent="⏸ Pausa"; $("b-pause").disabled=true;
+  $("hint").textContent="Premi il primo tasto per far partire la clessidra ⏳";
+  renderKB(); renderLine(); updateStats(); updateTimer(); updateRunner();
+  show("s-game");
+  $("textbox").focus();
+}
+
+function renderLine(){
+  const L=G.line;
+  let h="";
+  for(let i=0;i<L.length;i++){
+    const ch=L[i];
+    let cls="c";
+    if(i<G.pos) cls+=" done";
+    else if(i===G.pos) cls+= (G.wrongAt===i?" wrong":" cur");
+    const shown = ch===" " ? (i>=G.pos?'<span class="sp">·</span>':"&nbsp;") : esc(ch);
+    h+=`<span class="${cls}">${shown}</span>`;
+  }
+  $("line").innerHTML=h;
+  $("next").textContent = G.nextLine;
+  markNextKey();
+}
+
+function minutes(){return Math.max(G.elapsed,1)/60;}
+function calc(){
+  const m = minutes();
+  const wpm = G.elapsed>0 ? Math.round((G.correct/5)/m) : 0;
+  const cpm = G.elapsed>0 ? Math.round(G.correct/m) : 0;
+  const tot = G.correct+G.errors;
+  const acc = tot? Math.round(G.correct/tot*100) : 100;
+  return {wpm,cpm,acc};
+}
+function updateStats(){
+  const c=calc();
+  $("st-wpm").textContent=c.wpm; $("st-acc").textContent=c.acc+"%"; $("st-err").textContent=G.errors;
+}
+function updateRunner(){
+  const lapLen = 120;
+  const p = (G.correct % lapLen)/lapLen;
+  const w = $("track").clientWidth - 90;
+  $("runner").style.left = (8 + p*w)+"px";
+  $("laps").textContent = G.laps? "⭐".repeat(Math.min(G.laps,10))+(G.laps>10?" ×"+G.laps:"") : "";
+}
+function updateTimer(){
+  $("g-time").textContent = fmt(G.left);
+  const frac = G.total>0 ? Math.max(0,Math.min(1,G.left/G.total)) : 0;
+  // sabbia sopra: da y=12 (pieno) a y=35 (vuoto)
+  const topH = 23*frac; $("sandTopClip").setAttribute("y",35-topH); $("sandTopClip").setAttribute("height",topH);
+  const botH = 27*(1-frac); $("sandBotClip").setAttribute("y",64-botH); $("sandBotClip").setAttribute("height",botH);
+  $("stream").setAttribute("opacity", G.running && !G.paused && frac>0 ? 1 : 0);
+}
+
+function tick(ts){
+  if(!G||!G.running||G.paused||G.finished) return;
+  const dt = (ts - G.lastTick)/1000; G.lastTick = ts;
+  G.elapsed += dt; G.left = Math.max(0, G.total - G.elapsed);
+  updateTimer();
+  if(Math.floor(G.elapsed*2)!==Math.floor((G.elapsed-dt)*2)) updateStats();
+  if(G.left<=0){ finish("Tempo scaduto"); return; }
+  requestAnimationFrame(tick);
+}
+function begin(){
+  G.running=true; G.started=new Date(); G.lastTick=performance.now();
+  $("b-pause").disabled=false;
+  $("hint").textContent="Guarda lo schermo, non le mani! 👀";
+  requestAnimationFrame(tick);
+}
+
+function norm(c){ return $("o-case").checked ? c.toLowerCase() : c; }
+
+document.addEventListener("keydown",e=>{
+  if(!G || G.finished || $("s-game").classList.contains("hidden")) return;
+  if(e.ctrlKey||e.metaKey||e.altKey && e.key.length!==1) return;
+  const k = e.key;
+  if(k.length!==1) return;           // ignora Shift, Tab, ecc.
+  e.preventDefault();
+  if(G.paused) return;
+  if(!G.running) begin();
+  const target = G.line[G.pos];
+  if(norm(k)===norm(target)){
+    G.correct++; G.wrongAt=-1; G.pos++;
+    if(target===" ") G.words++;
+    if(G.correct % 120 === 0){ G.laps++; beep(880,.2,"triangle"); }
+    if(G.pos>=G.line.length){
+      G.words++; beep(660,.12,"sine");
+      G.line=G.nextLine; G.nextLine=makeLine(); G.pos=0;
+    }
+  } else {
+    G.errors++; G.wrongAt=G.pos;
+    const t = target===" " ? "spazio" : target.toLowerCase();
+    G.missed[t]=(G.missed[t]||0)+1;
+    flashBad(target); beep(180,.12,"square");
+  }
+  renderLine(); updateStats(); updateRunner();
+});
+
+$("textbox").addEventListener("focus",()=>$("textbox").classList.add("focus"));
+$("textbox").addEventListener("blur",()=>$("textbox").classList.remove("focus"));
+
+document.querySelectorAll("[data-gadj]").forEach(b=>b.addEventListener("click",()=>{
+  if(!G||G.finished) return;
+  const d=+b.dataset.gadj;
+  const newTotal = Math.min(600,Math.max(Math.ceil(G.elapsed)+5,15,G.total+d));
+  G.total=newTotal; G.left=Math.max(0,G.total-G.elapsed);
+  if(!G.running){duration=G.total; setDuration(duration);}
+  updateTimer(); b.blur(); $("textbox").focus();
+}));
+$("b-pause").addEventListener("click",()=>{
+  if(!G||!G.running||G.finished) return;
+  G.paused=!G.paused;
+  $("b-pause").textContent = G.paused?"▶ Riprendi":"⏸ Pausa";
+  $("hint").textContent = G.paused?"In pausa… il tuo animale si riposa 💤":"Guarda lo schermo, non le mani! 👀";
+  if(!G.paused){G.lastTick=performance.now();requestAnimationFrame(tick);}
+  updateTimer(); $("b-pause").blur(); $("textbox").focus();
+});
+$("b-reset").addEventListener("click",()=>{ if(G){G.finished=true;} startGame(); });
+$("b-stop").addEventListener("click",()=>{ if(G && G.running && !G.finished) finish("Interrotto prima della fine"); else if(G && !G.running){ G.finished=true; show("s-profile"); } });
+$("b-back").addEventListener("click",()=>{ if(G) G.finished=true; show("s-profile"); });
+
+/* ---------- Fine e risultati ---------- */
+function badgeFor(wpm){ let b=BADGES[0]; BADGES.forEach(x=>{if(wpm>=x.min)b=x;}); return b; }
+function finish(esito){
+  G.finished=true; G.running=false; updateTimer();
+  const c = calc(); const b = badgeFor(c.wpm);
+  const missed = Object.entries(G.missed).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const st=G.started||new Date();
+  rounds.push({
+    esito:esito, timer:G.total, secs:G.elapsed,
+    quando:st.toLocaleDateString("it-IT")+" "+st.toLocaleTimeString("it-IT"),
+    n:rounds.length+1, ora:new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}),
+    livello:level.name, durata:Math.round(G.elapsed), wpm:c.wpm, cpm:c.cpm, acc:c.acc,
+    errori:G.errors, parole:G.words, corretti:G.correct, badge:b, missed
+  });
+  beep(523,.15); setTimeout(()=>beep(659,.15),150); setTimeout(()=>beep(784,.25),300);
+  showResult();
+}
+function showResult(){
+  const r = rounds[rounds.length-1];
+  $("r-badge").textContent=r.badge.e;
+  $("r-title").textContent=`Bravo ${profile.nome}! Sei un ${r.badge.n}`;
+  $("r-sub").textContent=r.badge.t;
+  $("r-wpm").textContent=r.wpm; $("r-cpm").textContent=r.cpm; $("r-acc").textContent=r.acc+"%";
+  $("r-words").textContent=r.parole; $("r-err").textContent=r.errori;
+  $("r-missed-wrap").classList.toggle("hidden",!r.missed.length);
+  $("r-missed").innerHTML=r.missed.map(([k,v])=>`<span>${esc(k)} ×${v}</span>`).join("");
+  $("r-rows").innerHTML=rounds.map(x=>`<tr><td>${x.n}</td><td>${x.ora}</td><td>${esc(x.livello)}</td><td>${fmt(x.durata)}</td><td><b>${x.wpm}</b></td><td>${x.acc}%</td><td>${x.errori}</td><td>${x.badge.e} ${x.badge.n}</td></tr>`).join("");
+  show("s-result");
+}
+$("b-again").addEventListener("click",()=>startGame());
+$("b-change").addEventListener("click",()=>show("s-profile"));
+$("b-new").addEventListener("click",()=>{
+  if(rounds.length && !confirmNew()) return;
+  ["p-nome","p-cognome","p-eta"].forEach(id=>$(id).value="");
+  $("r-note").value=""; rounds=[]; profile=null; G=null; show("s-profile"); $("p-nome").focus();
+});
+function confirmNew(){ return window.confirm("Hai scaricato il report? I risultati di questo bambino verranno cancellati."); }
+
+/* ---------- Report ---------- */
+$("b-report").addEventListener("click",()=>{
+  const p=profile, best = rounds.reduce((a,b)=>b.wpm>a.wpm?b:a,rounds[0]);
+  const avgW = Math.round(rounds.reduce((s,r)=>s+r.wpm,0)/rounds.length);
+  const avgA = Math.round(rounds.reduce((s,r)=>s+r.acc,0)/rounds.length);
+  const allMissed={}; rounds.forEach(r=>r.missed.forEach(([k,v])=>allMissed[k]=(allMissed[k]||0)+v));
+  const miss = Object.entries(allMissed).sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const dataIt = p.data ? new Date(p.data+"T12:00").toLocaleDateString("it-IT",{day:"numeric",month:"long",year:"numeric"}) : "";
+  const note = $("r-note").value.trim();
+  const maxW = Math.max(...rounds.map(r=>r.wpm),1);
+  const html = `<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8"><title>Report digitazione – ${esc(p.nome)} ${esc(p.cognome)}</title>
+<style>
+body{font-family:"Trebuchet MS","Segoe UI",sans-serif;color:#2f3a2c;max-width:780px;margin:30px auto;padding:0 20px;background:#fff}
+h1{margin:0;font-size:26px}.sub{color:#6e7a68;margin:4px 0 20px}
+.box{border:2px solid #e2dccb;border-radius:14px;padding:16px;margin-bottom:16px}
+.info{display:grid;grid-template-columns:repeat(2,1fr);gap:6px 20px;font-size:15px}
+.info b{color:#6e7a68;font-weight:600;margin-right:6px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi div{background:#f4efe2;border-radius:12px;padding:10px;text-align:center}
+.kpi strong{display:block;font-size:26px}.kpi span{font-size:12px;color:#6e7a68}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:7px 8px;border-bottom:1px solid #e2dccb;text-align:left}
+th{font-size:11px;text-transform:uppercase;color:#6e7a68}
+.bar{height:10px;background:#5fa36f;border-radius:5px}
+table.kv{margin-top:8px}table.kv td{border:1px solid #e2dccb;padding:8px 10px}table.kv td:first-child{width:55%;color:#4a5546}
+.miss span{display:inline-block;background:#fbe1dc;border-radius:8px;padding:3px 9px;margin:3px;font-family:monospace;font-weight:700}
+.sign{display:flex;justify-content:space-between;margin-top:40px;font-size:14px;color:#6e7a68}
+.sign div{border-top:1px solid #999;padding-top:6px;width:40%;text-align:center}
+@media print{body{margin:0}}
+</style></head><body>
+<h1>🐾 Report esercizio di digitazione</h1>
+<p class="sub">Digita con gli Animali · ${esc(dataIt)}</p>
+<p><b>Alunno:</b> ${esc(p.nome)} ${esc(p.cognome)} · <b>Classe:</b> ${esc(p.classe)} · <b>Tentativi totali:</b> ${rounds.length}</p>
+<div class="box info">
+<div><b>Nome</b>${esc(p.nome)}</div><div><b>Cognome</b>${esc(p.cognome)}</div>
+<div><b>Classe</b>${esc(p.classe)}</div><div><b>Età</b>${esc(p.eta||"—")}</div>
+<div><b>Scuola</b>${esc(p.scuola||"—")}</div><div><b>Insegnante</b>${esc(p.insegnante||"—")}</div>
+<div><b>Animale guida</b>${avatar.e} ${avatar.n}</div><div><b>Prove svolte</b>${rounds.length}</div>
+</div>
+<div class="box kpi">
+<div><strong>${best.wpm}</strong><span>miglior parole/min</span></div>
+<div><strong>${avgW}</strong><span>media parole/min</span></div>
+<div><strong>${avgA}%</strong><span>precisione media</span></div>
+<div><strong>${best.badge.e}</strong><span>livello: ${best.badge.n}</span></div>
+</div>
+${rounds.map(r=>{const tot=r.corretti+r.errori,rows=[
+ ["Data e ora del gioco",r.quando],["Titolo dell'esercizio",esc(r.livello)],["Esito",r.esito],
+ ["Tempo di esecuzione",`${fmt(Math.floor(r.secs))} (${r.secs.toFixed(1).replace(".",",")} secondi) su ${r.timer} s di timer`],
+ ["Tentativo numero",r.n],
+ ["Caratteri digitati correttamente (spazi compresi)",r.corretti],["Caratteri digitati in modo errato",r.errori],
+ ["Totale caratteri digitati (corretti + errati)",tot],["Parole completate",r.parole],
+ ["Parole al minuto",r.wpm],["Precisione",r.acc+"%"],
+ ["Tempo medio per carattere corretto",r.corretti?(r.secs/r.corretti).toFixed(2).replace(".",",")+" secondi":"—"],
+ ["Animale raggiunto",r.badge.e+" "+r.badge.n],
+ ["Tasti da allenare",r.missed.length?r.missed.map(([k,v])=>esc(k)+" ×"+v).join(", "):"—"]];
+ return `<div class="box"><b>Tentativo n. ${r.n} – ${esc(r.livello)}</b><table class="kv">${rows.map(([k,v])=>`<tr><td>${k}</td><td><b>${v}</b></td></tr>`).join("")}</table></div>`;}).join("")}
+<div class="box"><b>Riepilogo delle prove</b>
+<table><thead><tr><th>#</th><th>Ora</th><th>Percorso</th><th>Durata</th><th>Parole/min</th><th></th><th>Car./min</th><th>Precisione</th><th>Errori</th><th>Parole</th></tr></thead><tbody>
+${rounds.map(r=>`<tr><td>${r.n}</td><td>${r.ora}</td><td>${esc(r.livello)}</td><td>${fmt(r.durata)}</td><td><b>${r.wpm}</b></td><td style="width:90px"><div class="bar" style="width:${Math.round(r.wpm/maxW*100)}%"></div></td><td>${r.cpm}</td><td>${r.acc}%</td><td>${r.errori}</td><td>${r.parole}</td></tr>`).join("")}
+</tbody></table></div>
+${miss.length?`<div class="box"><b>Tasti da allenare</b><div class="miss">${miss.map(([k,v])=>`<span>${esc(k)} ×${v}</span>`).join("")}</div></div>`:""}
+${note?`<div class="box"><b>Note dell'insegnante</b><p style="white-space:pre-wrap;margin:8px 0 0">${esc(note)}</p></div>`:""}
+<p style="font-size:12px;color:#6e7a68">Parole al minuto = (caratteri corretti ÷ 5) ÷ minuti. Precisione = tasti giusti ÷ tasti premuti.</p>
+<div class="sign"><div>Firma insegnante</div><div>Firma genitore</div></div>
+</body></html>`;
+  const blob = new Blob([html],{type:"text/html;charset=utf-8"});
+  const a = document.createElement("a");
+  const safe = s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w]+/g,"_");
+  a.href = URL.createObjectURL(blob);
+  a.download = `report_${safe(p.cognome)}_${safe(p.nome)}_${p.data||"oggi"}.html`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+});
+
+window.addEventListener("resize",()=>{ if(G) updateRunner(); });
+})();
+</script>
+</body>
+</html>
