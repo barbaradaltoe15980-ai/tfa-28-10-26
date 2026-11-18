@@ -39,6 +39,19 @@ label.f input:focus,label.f select:focus{outline:none;border-color:var(--green-2
 .level span{font-size:13px;color:var(--muted)}
 .level .em{font-size:26px;float:right}
 .level.sel{border-color:var(--green);background:var(--green-soft)}
+.tlib{margin-top:14px;border:3px dashed var(--green-2);border-radius:16px;padding:16px;background:#fbfdf9}
+.tlib-head b{display:block;font-size:17px;margin-bottom:2px}
+.tlib-head span{font-size:13px;color:var(--muted)}
+.tlib textarea{font:inherit;padding:11px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);font-size:15px;resize:vertical;min-height:110px}
+.tlib .f{margin-top:10px}
+.titem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:2px solid var(--line);border-radius:12px;background:#fff;margin-top:8px;flex-wrap:wrap}
+.titem.sel{border-color:var(--green);background:var(--green-soft)}
+.titem .tt{flex:1 1 200px;min-width:0}
+.titem .tt b{display:block}
+.titem .tt small{color:var(--muted)}
+.tempty{color:var(--muted);font-size:14px;margin-top:10px}
+.tnote{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.t-msg{font-weight:700;color:var(--green);min-height:18px;margin-top:6px;font-size:14px}
 .opts{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;font-size:14px}
 .opts label{display:flex;align-items:center;gap:8px}
 .btn{border:none;border-radius:14px;padding:12px 20px;font-weight:800;font-size:16px;background:var(--green);color:#fff;box-shadow:0 4px 0 #2c5937}
@@ -150,6 +163,16 @@ th{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.4p
 
     <div class="section-title">Scegli il percorso</div>
     <div class="levels" id="levels"></div>
+    <div class="tlib hidden" id="tlib">
+      <div class="tlib-head"><b>📜 I testi dell'insegnante</b><span>Scrivi o incolla un testo, dagli un titolo e salvalo. Puoi salvarne quanti vuoi: scegli con "Usa" quello per la partita.</span></div>
+      <label class="f">Titolo<input id="t-title" placeholder="es. La volpe e l'uva" autocomplete="off"></label>
+      <label class="f">Testo<textarea id="t-body" placeholder="Incolla qui il testo da far digitare…"></textarea></label>
+      <div class="actions" style="margin-top:10px"><button class="btn small" id="t-save">💾 Salva testo</button><button class="btn small sec" id="t-clear">Svuota</button></div>
+      <div id="t-list"></div>
+      <div class="actions"><button class="btn small sand" id="t-export">⬇ Scarica tutti i testi (JSON)</button><button class="btn small sec" id="t-import">⬆ Carica i testi (JSON)</button><input type="file" id="t-file" accept=".json,application/json" hidden></div>
+      <p class="tnote">I testi restano salvati in questo browser, su questo computer. Con "⬇ JSON" accanto a un testo salvi solo quel testo in un file con il suo nome (es. Pinocchio.json): tienili in una cartella come archivio. Un altro giorno, o su un altro computer, premi "Carica i testi" e scegli il file: il testo torna ed è subito pronto da usare.</p>
+      <div class="t-msg" id="t-msg" role="status"></div>
+    </div>
 
     <div class="section-title">⏳ Clessidra</div>
     <div class="timerbox" style="display:inline-flex">
@@ -293,7 +316,7 @@ th{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.4p
     </div>
   </section>
 
-  <div class="foot">Funziona anche senza internet · i dati restano su questo computer finché la pagina è aperta</div>
+  <div class="foot">Funziona anche senza internet · i risultati dei bambini restano finché la pagina è aperta · i testi dell'insegnante restano salvati in questo browser</div>
 </div>
 
 <script>/* jsPDF 2.5.1 (MIT) – incluso per creare il report in PDF anche senza internet */
@@ -718,7 +741,8 @@ const LEVELS = [
     "il leone è il re della savana","la rana salta nello stagno","il pinguino nuota nel mare freddo",
     "lo scoiattolo raccoglie le ghiande","la giraffa mangia le foglie alte","il lupo ulula alla luna",
     "la farfalla vola sui fiori","il cane gioca con la palla","la balena canta nel mare",
-    "il riccio si chiude a palla","la mucca mangia l'erba del prato","il pappagallo ripete le parole"]}
+    "il riccio si chiude a palla","la mucca mangia l'erba del prato","il pappagallo ripete le parole"]},
+ {id:6,em:"📜",name:"Testo dell'insegnante",desc:"Un testo scelto dall'insegnante",type:"custom"}
 ];
 const BADGES = [
   {min:0,e:"🐢",n:"Tartaruga",t:"Piano piano si va lontano!"},
@@ -755,11 +779,77 @@ $("p-data").value = new Date().toISOString().slice(0,10);
 function renderAvatars(){
   $("avatars").innerHTML = ANIMALS.map((a,i)=>`<button class="avatar ${a===avatar?"sel":""}" data-i="${i}" title="${a.n}" aria-label="${a.n}">${a.e}</button>`).join("");
 }
+function tlTitle(){try{const t=curText();return t?t.titolo:"";}catch(e){return "";}}
 function renderLevels(){
-  $("levels").innerHTML = LEVELS.map((l,i)=>`<button class="level ${l===level?"sel":""}" data-i="${i}"><span class="em">${l.em}</span><b>${i+1}. ${l.name}</b><span>${l.desc}</span></button>`).join("");
+  $("levels").innerHTML = LEVELS.map((l,i)=>`<button class="level ${l===level?"sel":""}" data-i="${i}"><span class="em">${l.em}</span><b>${i+1}. ${l.name}</b><span>${l.type==="custom"&&tlTitle()?"In uso: "+esc(tlTitle()):l.desc}</span></button>`).join("");
+  try{renderTexts();}catch(e){}
 }
 $("avatars").addEventListener("click",e=>{const b=e.target.closest(".avatar");if(!b)return;avatar=ANIMALS[+b.dataset.i];renderAvatars();});
 $("levels").addEventListener("click",e=>{const b=e.target.closest(".level");if(!b)return;level=LEVELS[+b.dataset.i];renderLevels();});
+
+/* ---------- Testi dell'insegnante ---------- */
+const TKEY="dga_testi_v1", TSEL="dga_testo_sel";
+const lsGet=(k,d)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):d;}catch(e){return d;}};
+const lsSet=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v));return true;}catch(e){return false;}};
+let texts=lsGet(TKEY,[]), selText=lsGet(TSEL,null), editId=null;
+function cleanText(t){return String(t||"").replace(/[\u2018\u2019\u00b4`]/g,"'").replace(/[\u201c\u201d\u00ab\u00bb]/g,'"').replace(/[\u2013\u2014]/g,"-").replace(/\u2026/g,"...").replace(/\u00a0/g," ").replace(/\s+/g," ").trim();}
+function saveTexts(){if(!lsSet(TKEY,texts))tmsg("Attenzione: questo browser non permette di salvare. Usa \"Scarica i testi\" per non perderli.");lsSet(TSEL,selText);}
+function tmsg(m){$("t-msg").textContent=m;clearTimeout(tmsg.t);tmsg.t=setTimeout(()=>$("t-msg").textContent="",5000);}
+function curText(){return texts.find(t=>t.id===selText)||null;}
+function renderTexts(){
+  $("tlib").classList.toggle("hidden",level.type!=="custom");
+  if(!texts.length){$("t-list").innerHTML='<div class="tempty">Non ci sono ancora testi salvati.</div>';return;}
+  $("t-list").innerHTML=texts.map(t=>`<div class="titem${t.id===selText?" sel":""}" data-id="${t.id}">
+    <div class="tt"><b>${t.id===selText?"✅ ":""}${esc(t.titolo)}</b><small>${t.testo.length} caratteri · ${esc(t.testo.slice(0,60))}${t.testo.length>60?"…":""}</small></div>
+    <button class="btn small${t.id===selText?"":" sec"}" data-act="use">${t.id===selText?"In uso":"Usa"}</button>
+    <button class="btn small sec" data-act="exp" title="Salva solo questo testo in un file JSON">⬇ JSON</button>
+    <button class="btn small sec" data-act="edit">✏️ Modifica</button>
+    <button class="btn small sec" data-act="del">🗑️</button></div>`).join("");
+}
+$("t-list").addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;const id=b.closest(".titem").dataset.id,t=texts.find(x=>x.id===id);if(!t)return;
+  if(b.dataset.act==="use"){selText=id;saveTexts();renderTexts();renderLevels();tmsg("Testo scelto: "+t.titolo);}
+  if(b.dataset.act==="exp"){exportTexts([t],safeName(t.titolo)+".json");tmsg("Scaricato il file "+safeName(t.titolo)+".json");}
+  if(b.dataset.act==="edit"){editId=id;$("t-title").value=t.titolo;$("t-body").value=t.testo;$("t-save").textContent="💾 Salva modifiche";$("t-title").focus();}
+  if(b.dataset.act==="del"){if(!window.confirm("Eliminare il testo \""+t.titolo+"\"?"))return;texts=texts.filter(x=>x.id!==id);if(selText===id)selText=texts[0]?texts[0].id:null;saveTexts();renderTexts();renderLevels();tmsg("Testo eliminato.");}
+});
+$("t-save").addEventListener("click",()=>{
+  const testo=cleanText($("t-body").value);let titolo=$("t-title").value.trim();
+  if(!testo){tmsg("Scrivi o incolla un testo prima di salvare.");return;}
+  if(!titolo)titolo=testo.split(" ").slice(0,5).join(" ")+"…";
+  if(editId){const t=texts.find(x=>x.id===editId);if(t){t.titolo=titolo;t.testo=testo;t.data=new Date().toISOString().slice(0,10);}selText=editId;}
+  else{const t={id:"t"+Date.now().toString(36),titolo,testo,data:new Date().toISOString().slice(0,10)};texts.push(t);selText=t.id;}
+  saveTexts();editId=null;$("t-title").value="";$("t-body").value="";$("t-save").textContent="💾 Salva testo";renderTexts();renderLevels();tmsg("Testo salvato e scelto: "+titolo);
+});
+renderLevels();
+$("t-clear").addEventListener("click",()=>{editId=null;$("t-title").value="";$("t-body").value="";$("t-save").textContent="💾 Salva testo";});
+function safeName(t){return (String(t).normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w]+/g,"_").replace(/^_+|_+$/g,"").slice(0,40))||"testo";}
+function exportTexts(list,filename){
+  const data={app:"Digita con gli Animali",tipo:"testi dell'insegnante",esportato:new Date().toISOString(),testi:list.map(t=>({titolo:t.titolo,testo:t.testo,data:t.data}))};
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));
+  a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+$("t-export").addEventListener("click",()=>{
+  if(!texts.length){tmsg("Non ci sono testi da scaricare.");return;}
+  exportTexts(texts,"tutti_i_testi_"+new Date().toISOString().slice(0,10)+".json");
+  tmsg("Scaricato il file con tutti i "+texts.length+" testi.");
+});
+$("t-import").addEventListener("click",()=>$("t-file").click());
+$("t-file").addEventListener("change",e=>{
+  const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+  rd.onload=()=>{
+    try{
+      const d=JSON.parse(rd.result),arr=Array.isArray(d)?d:(d.testi||(d.testo?[d]:[]));let n=0,last=null;
+      arr.forEach(x=>{const testo=cleanText(x.testo||x.text||"");if(!testo)return;const titolo=String(x.titolo||x.title||testo.split(" ").slice(0,5).join(" ")).trim();
+        const ex=texts.find(t=>t.titolo===titolo&&t.testo===testo);if(ex){last=ex;return;}
+        const t={id:"t"+Date.now().toString(36)+n,titolo,testo,data:x.data||new Date().toISOString().slice(0,10)};texts.push(t);last=t;n++;});
+      if(last)selText=last.id;saveTexts();renderTexts();renderLevels();
+      tmsg(last?("Testo pronto da usare: "+last.titolo+(n>1?" (caricati "+n+" testi)":"")):"Questo file non contiene testi.");
+    }catch(err){tmsg("Questo file non sembra un file di testi valido.");}
+    e.target.value="";
+  };
+  rd.readAsText(f);
+});
 document.querySelectorAll("[data-adj]").forEach(b=>b.addEventListener("click",()=>{setDuration(duration+ +b.dataset.adj);}));
 document.querySelectorAll("[data-preset]").forEach(b=>b.addEventListener("click",()=>{setDuration(+b.dataset.preset);}));
 function setDuration(d){duration=Math.min(600,Math.max(15,d));$("pre-time").textContent=fmt(duration);}
@@ -774,7 +864,8 @@ function readProfile(){
 }
 $("b-start").addEventListener("click",()=>{
   const p = readProfile();
-  if(!p.nome||!p.cognome||!p.classe){$("p-err").classList.remove("hidden");return;}
+  if(!p.nome||!p.cognome||!p.classe){$("p-err").textContent="Compila nome, cognome e classe per iniziare.";$("p-err").classList.remove("hidden");return;}
+  if(level.type==="custom"&&!curText()){$("p-err").textContent="Salva o scegli un testo dell'insegnante per questo percorso.";$("p-err").classList.remove("hidden");return;}
   $("p-err").classList.add("hidden");
   const same = profile && profile.nome===p.nome && profile.cognome===p.cognome;
   if(!same) rounds = [];
@@ -809,6 +900,12 @@ function flashBad(ch){
 /* ---------- Generazione testo ---------- */
 function makeLine(){
   const L = level, parts=[]; let len=0;
+  if(L.type==="custom"){
+    const T=G.ctext;if(G.cpos>=T.length)return "";
+    let end=Math.min(T.length,G.cpos+40);
+    if(end<T.length){const sp=T.lastIndexOf(" ",end);if(sp>G.cpos+8)end=sp+1;}
+    const out=T.slice(G.cpos,end);G.cpos=end;return out;
+  }
   if(L.type==="sentences"){
     let s = rnd(L.list);
     if(G && G.lastSentence===s) s = rnd(L.list);
@@ -849,12 +946,14 @@ function startGame(){
     total:duration, left:duration, running:false, paused:false, finished:false,
     started:null, elapsed:0, lastTick:0,
     line:"", pos:0, nextLine:"", wrongAt:-1,
-    correct:0, errors:0, words:0, missed:{}, laps:0, lastSentence:null
+    correct:0, errors:0, words:0, missed:{}, laps:0, lastSentence:null,
+    ctext:"", cpos:0, ctitle:""
   };
+  if(level.type==="custom"){const t=curText();G.ctext=t?t.testo:"";G.ctitle=t?t.titolo:"";}
   G.line = makeLine(); G.nextLine = makeLine();
   $("g-av").textContent = avatar.e; $("runner").textContent = avatar.e;
   $("g-name").textContent = profile.nome+" "+profile.cognome+" · "+profile.classe;
-  $("g-level").textContent = level.em+" "+level.name;
+  $("g-level").textContent = level.em+" "+(level.type==="custom"?"Testo: "+G.ctitle:level.name);
   $("kbwrap").classList.toggle("hidden",!$("o-kb").checked);
   $("b-pause").textContent="⏸ Pausa"; $("b-pause").disabled=true;
   $("hint").textContent="Premi il primo tasto per far partire la clessidra ⏳";
@@ -940,8 +1039,10 @@ document.addEventListener("keydown",e=>{
     if(target===" ") G.words++;
     if(G.correct % 120 === 0){ G.laps++; beep(880,.2,"triangle"); }
     if(G.pos>=G.line.length){
-      G.words++; beep(660,.12,"sine");
+      if(target!==" ") G.words++;
+      beep(660,.12,"sine");
       G.line=G.nextLine; G.nextLine=makeLine(); G.pos=0;
+      if(!G.line){ renderLine(); updateStats(); updateRunner(); finish("Testo completato"); return; }
     }
   } else {
     G.errors++; G.wrongAt=G.pos;
@@ -986,7 +1087,8 @@ function finish(esito){
     esito:esito, timer:G.total, secs:G.elapsed,
     quando:st.toLocaleDateString("it-IT")+" "+st.toLocaleTimeString("it-IT"),
     n:rounds.length+1, ora:new Date().toLocaleTimeString("it-IT",{hour:"2-digit",minute:"2-digit"}),
-    livello:level.name, durata:Math.round(G.elapsed), wpm:c.wpm, cpm:c.cpm, acc:c.acc,
+    livello:level.type==="custom"?"Testo: "+G.ctitle:level.name, testoTot:level.type==="custom"?G.ctext.length:0, testoFatti:level.type==="custom"?G.correct:0,
+    durata:Math.round(G.elapsed), wpm:c.wpm, cpm:c.cpm, acc:c.acc,
     errori:G.errors, parole:G.words, corretti:G.correct, badge:b, missed
   });
   beep(523,.15); setTimeout(()=>beep(659,.15),150); setTimeout(()=>beep(784,.25),300);
@@ -1060,7 +1162,7 @@ function makePDF(){
     const rows=[["Data e ora del gioco",r.quando],["Titolo dell'esercizio",r.livello],["Esito",r.esito],
       ["Tempo di esecuzione",`${fmt(Math.floor(r.secs))} (${r.secs.toFixed(1).replace(".",",")} secondi) su ${r.timer} s di timer`],
       ["Tentativo numero",r.n],["Caratteri digitati correttamente (spazi compresi)",r.corretti],["Caratteri digitati in modo errato",r.errori],
-      ["Totale caratteri digitati (corretti + errati)",tot],["Parole completate",r.parole],["Parole al minuto",r.wpm],["Caratteri al minuto",r.cpm],["Precisione",r.acc+"%"],
+      ["Totale caratteri digitati (corretti + errati)",tot],["Parole completate",r.parole],...(r.testoTot?[["Caratteri del testo completati",`${Math.min(r.testoFatti,r.testoTot)} su ${r.testoTot}`]]:[]),["Parole al minuto",r.wpm],["Caratteri al minuto",r.cpm],["Precisione",r.acc+"%"],
       ["Tempo medio per carattere corretto",r.corretti?(r.secs/r.corretti).toFixed(2).replace(".",",")+" secondi":"—"],
       ["Animale raggiunto",r.badge.n],["Tasti da allenare",r.missed.length?r.missed.map(([a,b])=>a+" ×"+b).join(", "):"—"]];
     const rh=6.4; need(10+rows.length*rh);
